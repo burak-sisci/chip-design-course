@@ -60,7 +60,7 @@ Toplam kabaca 350-400 saat. Haftada 12 saatle ~8 ay, 6 saatle ~15 ay demek. Bu s
 
 **Konular**
 - Araçların kurulumu (birlikte): Git, VS Code, Claude Code masaüstü uygulaması, OSS CAD Suite (Icarus Verilog, Yosys, GTKWave, Verilator), Python, Node.js
-- GitHub reposunu oluşturma
+- GitHub reposunu tanıma (repo hazır: [burak-sisci/chip-design-course](https://github.com/burak-sisci/chip-design-course)); commit, push ve ders sonu akışının nasıl işlediği
 - İlk Verilog modülü: tek bir AND kapısı
 - Testbench nedir, neden tasarımla aynı anda yazılır?
 - Simülasyon akışı: `iverilog` ile derle → `vvp` ile çalıştır → `.vcd` dosyasını GTKWave'de aç
@@ -71,7 +71,7 @@ Toplam kabaca 350-400 saat. Haftada 12 saatle ~8 ay, 6 saatle ~15 ay demek. Bu s
 **Konu bitti sayılır eğer**
 - `rtl/and_kapisi.v` ve `tb/tb_and_kapisi.v` senin yazdığın dosyalar olarak repoda
 - GTKWave'de dört giriş kombinasyonunu gösteren dalga formu
-- İlk commit GitHub'da, sadece senin adınla
+- AND kapısı dosyaları GitHub'da; commit yazarı olarak sadece senin adın var
 
 **Ödev fikirleri:** OR, XOR ve NOT kapılarını aynı yöntemle yazıp simüle etmek.
 
