@@ -1,0 +1,4 @@
+# Tüm metin dosyaları LF satır sonuyla saklanır (bash betikleri CRLF ile bozulur)
+* text=auto eol=lf
+*.pdf binary
+*.png binary

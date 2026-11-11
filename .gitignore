@@ -1,0 +1,35 @@
+# Simülasyon çıktıları
+*.vcd
+*.fst
+*.vvp
+*.out
+sim_build/
+obj_dir/
+results.xml
+__pycache__/
+
+# Yosys ara dosyaları
+cizimler/*.json
+
+# Derleme çıktıları
+sw/build/
+*.o
+*.elf
+*.bin
+
+# OpenLane çalıştırma klasörleri
+runs/
+
+# Claude Code yerel ayarları
+.claude/settings.local.json
+
+# İşletim sistemi
+.DS_Store
+Thumbs.db
+
+# Şartname yerelde kalır (public repoya yüklenmez)
+docs/sartname/*.pdf
+docs/sartname/eski/
+
+# Koruma kancasının geçici kayıtları
+.claude/hooks/.anlik/
