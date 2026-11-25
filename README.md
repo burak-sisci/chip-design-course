@@ -16,7 +16,7 @@ Claude Code ile çalışılır. Kodu öğrenci yazar; Claude öğretir, inceler 
 Claude Code'a doğrudan yaz. Örneğin:
 
 - **"Derse başlayalım"** → Önceki ödev kontrol edilir, kaldığımız yerden devam edilir.
-- Ders sırasında → Konu çizimlerle anlatılır, sen kodunu yazarsın, "incele" dersin, takılınca ipucu istersin.
+- Ders sırasında → Konuyu tarayıcı panelinde açılan HTML sayfasından (`cizimler/konu-XX-<ad>.html`) okursun; sorularını sohbette sorarsın. Kodunu yazarsın, "incele" dersin, takılınca ipucu istersin. Anlatımın özeti konunun `notlar.md` dosyasında kalır.
 - **"Dersi bitirelim"** → Bir sonraki derse kadar yapacağın **ödev** verilir, ders özeti günlüğe eklenir.
 
 Bir konuya başlarken o konunun klasörü açılır ve bitiş ölçütleri klasördeki `durum.md`'ye kopyalanır. İlerledikçe kutular orada işaretlenir. Hepsi işaretlenince notsuz bir mini sınav ve anlatma testi yapılır, sonra sıradaki konuya geçilir.

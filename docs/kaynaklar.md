@@ -79,7 +79,7 @@ Bu iki tablo `docs/mufredat.md`'den üretildi. Müfredatta bir konunun kaynağı
 
 | Araç | Ne için? |
 |---|---|
-| OSS CAD Suite | Icarus Verilog, Yosys, GTKWave, Verilator — tek paket |
+| OSS CAD Suite | Icarus Verilog, Yosys, GTKWave, Verilator — tek paket. Kurulu sürüm: 2026-11-11 (Icarus 14.0 devel, Yosys 0.70+370), `C:\Users\burak\tools\oss-cad-suite`, kullanıcı PATH'inde; indirme: github.com/YosysHQ/oss-cad-suite-build/releases (son kontrol: 2026-11-11) |
 | Ripes | RISC-V assembly ve boru hattı görselleştirme |
 | RISC-V GCC | C programlarını çekirdek için derleme |
 | cocotb | Python ile testbench |

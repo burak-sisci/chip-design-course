@@ -99,6 +99,8 @@ Claude Code **masaüstü uygulamasında** sohbette bir HTML dosyasının yoluna 
 
 Gerekirse sayfa etkileşimli de olabilir: örneğin giriş anahtarlarına tıklayınca kapı çıkışlarının değiştiği küçük bir devre.
 
+Sayfa bir ders notudur: içerik önemlidir, görsel tasarım değil. Sayfa ekranın tüm genişliğini kullanır; dar sütun ve süsleme yoktur (kural: CLAUDE.md "Anlatım nerede okunur?").
+
 Terminalden çalışıyorsan aynı dosyayı çift tıklayarak normal tarayıcında açabilirsin.
 
 ## 6. Digital: tıklayarak devre kurma (isteğe bağlı)

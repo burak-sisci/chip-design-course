@@ -5,7 +5,7 @@ Bir madde üç farklı derste doğru cevaplanınca **Kapandı** olarak işaretle
 
 | # | Konu | Hata / yanlış anlama | Doğrusu (kendi cümlenle) | Durum |
 |---|---|---|---|---|
-| 1 | | | | Açık |
+| 1 | 0 | Testbench'te beklenen değeri tasarımla aynı formülle (`va & vb`) hesaplamak | Cevap anahtarı tasarımdan bağımsız olmalı; beklenen değer doğruluk tablosundan gelir. | Açık |
 
 ## Durum açıklaması
 

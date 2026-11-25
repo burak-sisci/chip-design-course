@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Konu 0 — Kurulum ve ilk simülasyon</title>
+<style>
+  body { font-family: system-ui, "Segoe UI", sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; color: #1d2433; line-height: 1.55; background: #fbfbfd; }
+  h1 { font-size: 1.6rem; margin-bottom: .2rem; }
+  h2 { font-size: 1.2rem; margin-top: 2.4rem; border-bottom: 2px solid #dfe3ec; padding-bottom: .3rem; }
+  .alt { color: #5a6378; margin-top: 0; }
+  .kutu { background: #fff; border: 1px solid #dfe3ec; border-radius: 10px; padding: 1rem 1.2rem; margin: 1rem 0; }
+  .ikili { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .ikili > div { background: #fff; border: 1px solid #dfe3ec; border-radius: 10px; padding: .8rem 1rem; }
+  .ikili h3 { margin: 0 0 .4rem; font-size: 1rem; }
+  table { border-collapse: collapse; margin: .5rem 0; }
+  th, td { border: 1px solid #c9cfdc; padding: .3rem .9rem; text-align: center; }
+  th { background: #eef1f7; }
+  tr.aktif td { background: #fff3c4; font-weight: 600; }
+  .anahtarlar { display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; }
+  button.anahtar { font: inherit; font-size: 1.1rem; min-width: 5.5rem; min-height: 44px; border-radius: 8px; border: 2px solid #3b5bdb; background: #fff; color: #3b5bdb; cursor: pointer; }
+  button.anahtar[aria-pressed="true"] { background: #3b5bdb; color: #fff; }
+  .soru { background: #eef6ee; border-left: 4px solid #2f9e44; padding: .6rem 1rem; border-radius: 6px; }
+  code { background: #eef1f7; padding: 0 .3rem; border-radius: 4px; overflow-wrap: anywhere; }
+  pre { background: #eef1f7; padding: .6rem; border-radius: 6px; overflow-x: auto; }
+  pre code { overflow-wrap: normal; padding: 0; }
+  td { overflow-wrap: anywhere; hyphens: auto; }
+  @media (max-width: 600px) { th, td { padding: .3rem .4rem; } }
+  #kapi-svg text { font-family: inherit; }
+  h3 { font-size: 1.05rem; margin-top: 1.6rem; }
+  table.genis { width: 100%; font-size: .95rem; }
+  table.genis td { text-align: left; vertical-align: top; }
+  .okuma { background: #f1f3f5; border-left: 4px solid #868e96; padding: .6rem 1rem; border-radius: 6px; }
+  .lejant { display: flex; flex-wrap: wrap; gap: 1.2rem; margin: .6rem 0; }
+  .lejant .ornek { display: inline-block; width: 1.6rem; height: 1rem; vertical-align: middle; margin-right: .3rem; border: 2px solid; }
+  .ornek.dosya-yaz { background: #dbe4ff; border-color: #3b5bdb; }
+  .ornek.program { background: #fff3bf; border-color: #e67700; border-radius: 1rem; }
+  .ornek.dosya-uret { background: #f1f3f5; border-color: #868e96; border-style: dashed; }
+</style>
+</head>
+<body>
+
+<h1>Konu 0 — Kurulum ve ilk simülasyon</h1>
+<p class="alt">Ders 1 · 2026-11-11</p>
+
+<h2>1. Ana fikir: yazdığın şey bir program değil, bir devre</h2>
+
+<div class="ikili">
+  <div>
+    <h3>Python (yazılım)</h3>
+    <p>Bir işlemci satırları <b>sırayla</b> çalıştırır. 2. satır, 1. satır bitince başlar. Bir değişken, ona değer atanana kadar eski değerinde kalır.</p>
+  </div>
+  <div>
+    <h3>Verilog (donanım tarifi)</h3>
+    <p>Yazdığın her satır <b>bir parça devre</b>dir ve hepsi <b>aynı anda</b> çalışır. Bir kablonun değeri, ona bağlı kapının girişi değiştiği an değişir. "Önce bu satır çalışsın" diye bir şey yoktur.</p>
+  </div>
+</div>
+
+<p>Bu yüzden Verilog'a "kod" deriz ama aslında bir <b>şema</b> çiziyoruz, sadece kalem yerine metinle. Çizdiğimiz şema doğru mu? Bunu görmek için gerçek bir çip üretemeyiz. Onun yerine bir <b>simülatör</b> devreyi bilgisayarda taklit eder. Konu 0'ın bütün amacı bu simülasyon ortamını kurmak.</p>
+
+<h2>2. Verilog tek dil değil: donanım tanımlama dilleri (HDL)</h2>
+
+<p><b>Ana fikir:</b> Birkaç kapılık bir devreyi kâğıda çizebilirsin. Ama bir mikrodenetleyicide yüz binlerce kapı var; bunu elle çizmek, değiştirmek ve doğrulamak imkânsız. Çözüm, devreyi <b>metinle tarif etmek</b>. Metni bilgisayar okuyup <b>simüle edebilir</b> (doğru mu?) ve <b>sentezleyebilir</b> (gerçek kapılara çevirebilir). Ayrıca metin git ile saklanır, kopyalanır, parametreyle büyütülür. Bu işi yapan dillere <b>HDL</b> (Hardware Description Language, donanım tanımlama dili) denir.</p>
+
+<p>"Kaç tane var?" sorusunun kesin bir sayısı yok; onlarca dil ve araç var. Ama hepsi üç kümeye ayrılır ve sanayinin <b>ortak dili</b> yalnızca üç tanedir:</p>
+
+<pre class="mermaid">
+flowchart TB
+    subgraph UST["Üst seviye: başka dilde yazıp Verilog ÜRETENLER"]
+        direction TB
+        HLS["HLS: C / C++ ile algoritma yaz"]
+        CH["Chisel, SpinalHDL (Scala içinde)"]
+        AM["Amaranth, MyHDL (Python içinde)"]
+        HLS ~~~ CH ~~~ AM
+    end
+    subgraph ANA["Sanayi standardı HDL'ler: araçların doğrudan okuduğu"]
+        direction TB
+        V["Verilog · 1984 · IEEE 1364"]
+        SV["SystemVerilog · 2005 · IEEE 1800<br/>Verilog'un üst kümesi"]
+        VH["VHDL · 1987 · IEEE 1076"]
+        V -- "genişletildi" --> SV
+        SV ~~~ VH
+    end
+    subgraph ARAC["Araçlar"]
+        direction TB
+        SIM(["Simülatör: doğru mu?"])
+        SEN(["Sentez: kapılara çevir"])
+        SIM ~~~ SEN
+    end
+    UST -- "Verilog dosyası üretir" --> ANA
+    ANA -- "okunur" --> ARAC
+</pre>
+
+<p class="okuma"><b>Nasıl okunur:</b> Üstteki kutu, kendi başına çipe dönüşmeyen dilleri gösterir; bunlar yazdığın kodu <b>Verilog'a çeviren</b> üreteçlerdir. Ortadaki üç dil, simülatör ve sentez araçlarının doğrudan anladığı dillerdir. Okun yönü "kim kimi besliyor" demek. Bu yüzden Verilog'a bazen "donanımın assembly'si" denir: kim ne yazarsa yazsın, araca giden çoğu zaman Verilog'dur.</p>
+<p class="okuma"><b>Şemadaki kısaltmalar:</b> <b>HLS</b> (High-Level Synthesis, üst seviye sentez): C/C++ ile yazılmış bir algoritmadan devre üretmek. <b>VHDL</b> (VHSIC Hardware Description Language; VHSIC = Very High Speed Integrated Circuit, çok yüksek hızlı tümleşik devre): ABD Savunma Bakanlığı'nın projesinde doğan dil. <b>IEEE</b> (Institute of Electrical and Electronics Engineers, Elektrik ve Elektronik Mühendisleri Enstitüsü): standartları yayımlayan kuruluş; "IEEE 1364" Verilog standardının numarasıdır.</p>
+
+<table class="genis">
+  <tr><th>Dil</th><th>Avantajı</th><th>Dezavantajı</th><th>Yoğun kullanıldığı yer</th></tr>
+  <tr><td><b>Verilog</b></td><td>Kısa, C'ye benzer yazım; öğrenmesi hızlı. Açık kaynak araçların hepsi destekler.</td><td>Tip denetimi zayıf: bit genişliği uyuşmazlığı, yazım hatasıyla oluşan fazladan kablo gibi hatalar <b>sessizce</b> geçer.</td><td>ASIC (Application-Specific Integrated Circuit, uygulamaya özel tümleşik devre: fabrikada üretilen, sonradan değişmeyen çip) sanayi, özellikle ABD ve Asya; açık kaynak çekirdekler</td></tr>
+  <tr><td><b>SystemVerilog</b></td><td>Verilog'un her şeyini içerir; daha güvenli yapılar (<code>logic</code>, <code>always_ff</code>) ve güçlü <b>doğrulama</b> dili (sınıflar, assertion, UVM: Universal Verification Methodology, evrensel doğrulama yöntemi; testbench'leri herkesin aynı kalıpla kurduğu standart).</td><td>Çok büyük bir dil; doğrulama kısmını açık kaynak araçlar tam desteklemez.</td><td>Bugün sanayide tasarım ve doğrulamanın ana dili; UVM doğrulaması</td></tr>
+  <tr><td><b>VHDL</b></td><td>Güçlü tip denetimi: hataların çoğu derleme anında yakalanır. Açık ve belgelemeye uygun.</td><td>Uzun yazım (aynı devre kabaca iki kat satır). Açık kaynak sentez desteği sınırlı.</td><td>Avrupa, savunma ve havacılık, FPGA (Field-Programmable Gate Array, sahada programlanabilir kapı dizisi: içindeki devre sonradan yeniden yüklenebilen çip) projeleri</td></tr>
+  <tr><td><b>Chisel / SpinalHDL</b></td><td>Programlama dilinin gücü: üreteç, parametre, tekrar kullanım.</td><td>Hata ayıklarken üretilen Verilog'u okumak gerekir; önce donanımı bilmek şart.</td><td>RISC-V (Reduced Instruction Set Computer, beşinci nesil; "indirgenmiş komut kümeli bilgisayar": serbestçe kullanılabilen bir işlemci komut kümesi) araştırması (ör. Berkeley'in çekirdekleri)</td></tr>
+  <tr><td><b>HLS (C/C++)</b></td><td>Algoritmayı hızlıca donanıma döker.</td><td>Üretilen devre üzerinde ince denetim zor; işlemci ve bus gibi kontrol ağırlıklı devrelerde zayıf.</td><td>FPGA hızlandırıcılar, sinyal ve görüntü işleme</td></tr>
+  <tr><td><b>Amaranth / MyHDL (Python)</b></td><td>Python bilen için tanıdık.</td><td>Küçük topluluk; yarışmada ve sanayide yaygın değil.</td><td>Hobi ve araştırma projeleri</td></tr>
+</table>
+
+<h3>Biz neden Verilog ile başlıyoruz?</h3>
+<ol>
+  <li><b>Şartname bunu istiyor.</b> Tasarım için Verilog, SystemVerilog veya VHDL kullanılmalı (şartname §4.1). AXI (Advanced eXtensible Interface, gelişmiş genişletilebilir arayüz: işlemcinin bellek ve çevre birimleriyle konuştuğu bus kuralları) arayüzlerinin doğrulaması ise <b>SystemVerilog ve UVM</b> ile yapılmalı (§4.1, §4.2.2.1). Verilog → SystemVerilog yolu ikisini birden karşılar; VHDL seçseydik doğrulama için ayrıca SystemVerilog öğrenmek gerekirdi.</li>
+  <li><b>Açık kaynak araç zinciri Verilog konuşur.</b> Icarus, Verilator, Yosys ve çip akışı OpenLane'in ana girişi Verilog'dur.</li>
+  <li><b>Hazır RISC-V çekirdeklerinin çoğu Verilog veya SystemVerilog.</b> SoC'u (System on Chip, yonga üstü sistem: işlemci, bellek ve çevre birimlerinin tek çipte birleşmesi) kurarken onları okuyup bağlayacaksın.</li>
+  <li><b>Ana kaynağımız Verilog anlatıyor.</b> <i>Kapıdan Silikona</i>'nın mantık devreleri kısmı Verilog ile.</li>
+  <li><b>SystemVerilog'a geçiş kesintisiz.</b> Verilog, SystemVerilog'un alt kümesi; Konu 8'de aynı kodu adım adım SystemVerilog'a taşıyacağız.</li>
+</ol>
+<p>Verilog'un zayıf noktası olan sessiz hataları <b>lint</b> aracıyla (Verilator; kodu çalıştırmadan şüpheli yerleri bulan denetleyici) ve iyi testbench'lerle kapatacağız.</p>
+
+<h2>3. İlk devremiz: AND kapısı</h2>
+
+<div class="kutu">
+  <svg id="kapi-svg" viewBox="0 0 420 160" width="420" height="160" role="img" aria-label="İki girişli AND kapısı">
+    <!-- Giriş kabloları -->
+    <line id="tel-a" x1="40" y1="55" x2="150" y2="55" stroke="#868e96" stroke-width="4"/>
+    <line id="tel-b" x1="40" y1="105" x2="150" y2="105" stroke="#868e96" stroke-width="4"/>
+    <!-- AND gövdesi: düz arka + yarım daire ön -->
+    <path d="M150 30 H210 A50 50 0 0 1 210 130 H150 Z" fill="#fff" stroke="#1d2433" stroke-width="3"/>
+    <!-- Çıkış kablosu -->
+    <line id="tel-y" x1="260" y1="80" x2="370" y2="80" stroke="#868e96" stroke-width="4"/>
+    <text x="10" y="61" font-size="20">a</text>
+    <text x="10" y="111" font-size="20">b</text>
+    <text x="380" y="86" font-size="20">y</text>
+    <text x="178" y="86" font-size="18" text-anchor="middle">&amp;</text>
+    <text id="deg-a" x="95" y="45" font-size="16" text-anchor="middle">0</text>
+    <text id="deg-b" x="95" y="95" font-size="16" text-anchor="middle">0</text>
+    <text id="deg-y" x="315" y="70" font-size="16" text-anchor="middle">0</text>
+  </svg>
+
+  <p>Girişlere tıkla, çıkışı ve doğruluk tablosunu izle:</p>
+  <div class="anahtarlar">
+    <button class="anahtar" id="btn-a" aria-pressed="false">a = 0</button>
+    <button class="anahtar" id="btn-b" aria-pressed="false">b = 0</button>
+    <span>→ <b id="cikis">y = 0</b></span>
+  </div>
+
+  <table id="dogruluk">
+    <tr><th>a</th><th>b</th><th>y = a AND b</th></tr>
+    <tr data-k="00"><td>0</td><td>0</td><td>0</td></tr>
+    <tr data-k="01"><td>0</td><td>1</td><td>0</td></tr>
+    <tr data-k="10"><td>1</td><td>0</td><td>0</td></tr>
+    <tr data-k="11"><td>1</td><td>1</td><td>1</td></tr>
+  </table>
+  <p>Kural tek cümle: <b>çıkış ancak bütün girişler 1 ise 1 olur.</b> Tablo 4 satır, çünkü 2 girişin her biri 0 veya 1 olabilir: 2 × 2 = 4 kombinasyon.</p>
+</div>
+
+<h2>4. Testbench: devreyi deneyen ikinci devre</h2>
+
+<p>Gerçek bir laboratuvarda devreyi test etmek için girişlere sinyal üreteci, çıkışa osiloskop bağlarsın. Simülasyonda bu ikisinin işini <b>testbench</b> yapar. O da Verilog ile yazılır, ama tek farkı <b>gerçek donanıma dönüşmemesidir</b>; sadece simülasyonda yaşar.</p>
+
+<pre class="mermaid">
+flowchart TB
+    subgraph TB["tb_and_kapisi (testbench, sadece simülasyonda var)"]
+        direction TB
+        U["Uyaran üreteci<br/>a ve b'ye sırayla<br/>00, 01, 10, 11 verir"]
+        DUT["and_kapisi<br/>(test edilen devre, DUT)"]
+        K["Kontrol<br/>y beklenen değer mi?<br/>Değilse HATA yaz"]
+        U -- a --> DUT
+        U -- b --> DUT
+        DUT -- y --> K
+        U -. beklenen y .-> K
+    end
+    TB -- "dalga.vcd" --> G["GTKWave<br/>(dalga formu)"]
+</pre>
+
+<p class="okuma"><b>Kısaltma:</b> <b>DUT</b> (Device Under Test, test edilen devre/cihaz): testbench'in içine yerleştirilip denenen tasarım. Burada DUT senin <code>and_kapisi</code> modülün.</p>
+
+<p>Neden tasarımla <b>aynı anda</b> yazılır? Çünkü testbench olmayan bir devre hakkında "çalışıyor" diyemezsin. Testbench'i sonra yazmaya bırakırsan, devreye nasıl bir giriş verileceğini düşünmeden tasarlamış olursun. Hatalar en ucuz, devre küçükken yakalanır.</p>
+
+<h2>5. Simülasyon akışı: metinden dalga formuna</h2>
+
+<p><b>Ana fikir:</b> Yazdığın Verilog metni tek başına bir şey yapmaz; onu okuyup devreyi taklit eden programlar gerekir. Bu şema <b>hangi dosyanın hangi programa girip ne çıktığını</b> gösterir. Şemada iki tür şey var, şekilleri ve renkleri farklı:</p>
+
+<div class="lejant">
+  <span><span class="ornek dosya-yaz"></span> <b>Dosya, senin yazdığın</b> (köşeli, mavi)</span>
+  <span><span class="ornek program"></span> <b>Program</b>, çalıştırdığın araç (yuvarlak, sarı)</span>
+  <span><span class="ornek dosya-uret"></span> <b>Dosya, bir programın ürettiği</b> (kesik çizgili, gri)</span>
+</div>
+
+<pre class="mermaid">
+flowchart TB
+    A["rtl/and_kapisi.v"]:::yaz
+    B["tb/tb_and_kapisi.v"]:::yaz
+    C(["iverilog"]):::prog
+    D["sim_build/and.vvp"]:::uret
+    E(["vvp"]):::prog
+    F["dalga.vcd"]:::uret
+    T["terminal çıktısı"]:::uret
+    G(["GTKWave"]):::prog
+    A -- "1 · okunur" --> C
+    B -- "1 · okunur" --> C
+    C -- "2 · üretir" --> D
+    D -- "3 · okunur" --> E
+    E -- "4 · yazar" --> F
+    E -- "4 · yazar" --> T
+    F -- "5 · okunur" --> G
+    classDef yaz fill:#dbe4ff,stroke:#3b5bdb,stroke-width:2px,color:#1d2433
+    classDef prog fill:#fff3bf,stroke:#e67700,stroke-width:2px,color:#1d2433
+    classDef uret fill:#f1f3f5,stroke:#868e96,stroke-width:2px,stroke-dasharray:6 4,color:#1d2433
+</pre>
+
+<h3>Kutulardaki yazılar ne anlama geliyor?</h3>
+<p>Kutudaki yazılar <b>dosya yolu</b>dur. <code>rtl/and_kapisi.v</code> = "<code>rtl</code> klasöründeki <code>and_kapisi.v</code> dosyası". Bilgisayarındaki tam yeri <code>chip-design-course/rtl/and_kapisi.v</code>. Sondaki <code>.v</code>, Python'daki <code>.py</code> gibi, dosyanın Verilog olduğunu söyleyen <b>uzantı</b>dır. Oklardaki numaralar sırayı gösterir.</p>
+
+<table class="genis">
+  <tr><th>Kutu</th><th>Ne?</th><th>Kim yapar?</th><th>Python'daki karşılığı</th></tr>
+  <tr><td><code>rtl/and_kapisi.v</code></td><td><b>Tasarım dosyası.</b> AND kapısının Verilog tarifi; çipe dönüşecek olan kısım.</td><td>Sen yazarsın</td><td>Yazdığın modül, ör. <code>hesap.py</code></td></tr>
+  <tr><td><code>tb/tb_and_kapisi.v</code></td><td><b>Testbench dosyası.</b> Tasarıma giriş verip çıkışı kontrol eden Verilog; çipe dönüşmez. Adındaki <code>tb_</code> ön eki bunu belirtir.</td><td>Sen yazarsın</td><td>Test dosyası, ör. <code>test_hesap.py</code></td></tr>
+  <tr><td><code>iverilog</code></td><td><b>Derleyici</b> (Icarus Verilog). İki dosyayı okur, yazım hatalarını bulur, simüle edilebilir bir model üretir.</td><td>Program; komutla çalıştırırsın</td><td>Python'un kodu çalıştırmadan önce okuyup yazım hatası vermesi</td></tr>
+  <tr><td><code>sim_build/and.vvp</code></td><td><b>Derlenmiş model.</b> İnsan okumaz; yalnızca <code>vvp</code> okur.</td><td><code>iverilog</code> üretir</td><td><code>__pycache__</code> içindeki <code>.pyc</code> dosyaları</td></tr>
+  <tr><td><code>vvp</code></td><td><b>Simülatör</b> (açılımı resmî belgelerde yok; yaygın yorum: Verilog Virtual Processor, Verilog sanal işlemcisi). <code>.vvp</code> dosyası bu hayali işlemcinin komut dilidir. Modeli zamanda ilerletir: "0. ns'de a=0, b=0 → y=0; 10. ns'de b=1 → y=0 …"</td><td>Program</td><td><code>python test_hesap.py</code> komutu</td></tr>
+  <tr><td>terminal çıktısı</td><td>Testbench'in yazdırdığı mesajlar: "TEST GEÇTİ" ya da "HATA: a=1 b=1 iken y=0".</td><td><code>vvp</code> yazar</td><td><code>print</code> çıktıları</td></tr>
+  <tr><td><code>dalga.vcd</code></td><td><b>Dalga kaydı</b> (Value Change Dump, "değer değişimi dökümü"). Her sinyalin hangi anda hangi değere geçtiğinin listesi.</td><td><code>vvp</code> yazar (testbench isterse)</td><td>Bir değişkenin değerini her adımda bir dosyaya kaydetmek</td></tr>
+  <tr><td><code>GTKWave</code></td><td><b>Dalga görüntüleyici.</b> Adındaki GTK (GIMP Toolkit), pencereyi çizen arayüz kütüphanesinin adı. <code>.vcd</code> dosyasını 6. bölümdeki gibi çizer.</td><td>Program</td><td>Kaydedilen veriyi grafiğe döken <code>matplotlib</code></td></tr>
+</table>
+
+<h3>Klasör adları neden böyle?</h3>
+<ul>
+  <li><code>rtl/</code>: <b>RTL</b> (Register Transfer Level, "yazmaçlar arası aktarım seviyesi"). Ana fikir: devreyi tek tek transistörlerle değil, "veri hangi işlemden geçip hangi hafıza hücresine gidiyor" seviyesinde tarif etmek. Bugün tasarımcıların yazdığı seviye budur; ayrıntısı Konu 4-7'de. Klasör adı "tasarım kodu burada" demek.</li>
+  <li><code>tb/</code>: testbench'ler.</li>
+  <li><code>sim_build/</code>: simülasyonun ürettiği ara dosyalar. Git'e girmez (<code>.gitignore</code>), her seferinde yeniden üretilir.</li>
+</ul>
+
+<p class="okuma"><b>Kısaca:</b> Sen iki metin yazarsın (mavi). Üç program (sarı) sırayla çalışır ve gri dosyaları üretir. Sonunda iki şeye bakarsın: terminalde "geçti mi?", GTKWave'de "dalga formu beklediğim gibi mi?"</p>
+
+<h2>6. Beklediğimiz dalga formu</h2>
+
+<p>Testbench her 10 ns'de (nanosaniye: saniyenin milyarda biri) bir girişi değiştirirse, GTKWave'de şuna benzer bir görüntü göreceksin:</p>
+
+<div class="kutu">
+<script type="WaveDrom">
+{ "signal": [
+  { "name": "zaman (ns)", "wave": "====", "data": ["0", "10", "20", "30"] },
+  { "name": "a", "wave": "0.1." },
+  { "name": "b", "wave": "0101" },
+  { "name": "y", "wave": "0..1" }
+],
+  "config": { "hscale": 2 } }
+</script>
+</div>
+
+<p class="soru"><b>Kendine sor:</b> y neden sadece son aralıkta 1? Bu dalga formunda doğruluk tablosunun dört satırını tek tek bulabiliyor musun?</p>
+
+<h2>7. Araçlar</h2>
+
+<table>
+  <tr><th>Araç</th><th>Ne işe yarar?</th><th>Durum</th></tr>
+  <tr><td>Git, VS Code, Python, Node.js</td><td>Sürüm kontrolü, düzenleyici, betikler</td><td>Kurulu</td></tr>
+  <tr><td>OSS CAD Suite (Open Source Software Computer-Aided Design Suite, açık kaynak bilgisayar destekli tasarım paketi)</td><td>iverilog, vvp, GTKWave, Yosys, Verilator — tek pakette</td><td>Kurulu: 2026-11-11 sürümü, <code>C:\Users\burak\tools\oss-cad-suite</code></td></tr>
+  <tr><td>netlistsvg</td><td>Verilog'dan kapı şeması çizer (<code>araclar/sema.sh</code>)</td><td>Kurulu (npm ile; npm = Node Package Manager, Node.js paket yöneticisi: Python'daki <code>pip</code>'in karşılığı)</td></tr>
+</table>
+
+<p><b>PATH ne demek?</b> Terminale <code>iverilog</code> yazdığında Windows bu programı nerede arayacağını bilmez. <b>PATH</b>, "programları şu klasörlerde ara" diyen bir klasör listesidir (bir ortam değişkeni). OSS CAD Suite'in <code>bin</code> ve <code>lib</code> klasörleri bu listeye eklendi; artık hangi klasörde olursan ol <code>iverilog</code> yazman yeter. Liste terminal açılırken okunur, bu yüzden <b>kurulumdan önce açık olan terminalleri ve VS Code'u bir kez kapatıp aç</b>.</p>
+
+<h2>8. Verilog'un ilk kelimeleri: bir modül nasıl yazılır?</h2>
+
+<p><b>Ana fikir:</b> Verilog'da her devre bir <b>modül</b>dür. Modülü, bacakları (pinleri) olan bir <b>çip kutusu</b> gibi düşün. Dışarıdan yalnızca pinler görünür: hangileri giriş, hangileri çıkış. Kutunun içinde ise pinlerin birbirine nasıl bağlandığı yazar. Bir modül yazmak üç soruyu cevaplamaktır: <b>(1)</b> Kutunun adı ne? <b>(2)</b> Pinleri neler, yönleri ne? <b>(3)</b> İçeride çıkış, girişlerden nasıl elde ediliyor?</p>
+
+<p>Bunu AND kapısıyla değil, onun kardeşi <b>NOT (DEĞİL) kapısıyla</b> göreceğiz; AND'i sen yazacaksın. NOT kapısının tek girişi var ve çıkış girişin tersidir: <code>a = 0</code> ise <code>y = 1</code>, <code>a = 1</code> ise <code>y = 0</code>.</p>
+
+<h3>8.1 Tasarım: <code>degil_kapisi</code> modülü</h3>
+
+<div class="kutu">
+  <svg viewBox="0 0 460 150" width="100%" style="max-width:460px" role="img" aria-label="degil_kapisi modülü: a giriş pini, y çıkış pini, içinde NOT kapısı">
+    <rect x="120" y="20" width="220" height="110" rx="8" fill="#f8f9fa" stroke="#1d2433" stroke-width="2" stroke-dasharray="7 4"/>
+    <text x="230" y="40" font-size="15" text-anchor="middle" fill="#5a6378">module degil_kapisi</text>
+    <line x1="20" y1="85" x2="185" y2="85" stroke="#3b5bdb" stroke-width="3"/>
+    <path d="M185 62 L235 85 L185 108 Z" fill="#fff" stroke="#1d2433" stroke-width="2.5"/>
+    <circle cx="242" cy="85" r="7" fill="#fff" stroke="#1d2433" stroke-width="2.5"/>
+    <line x1="249" y1="85" x2="440" y2="85" stroke="#e67700" stroke-width="3"/>
+    <text x="20" y="75" font-size="16">a</text>
+    <text x="35" y="110" font-size="13" fill="#3b5bdb">input</text>
+    <text x="430" y="75" font-size="16" text-anchor="end">y</text>
+    <text x="440" y="110" font-size="13" fill="#e67700" text-anchor="end">output</text>
+    <text x="230" y="124" font-size="13" text-anchor="middle" fill="#5a6378">assign y = ~a;</text>
+  </svg>
+  <p class="okuma"><b>Nasıl okunur:</b> Kesik çizgili kutu <b>modülün sınırı</b>; üstündeki yazı modülün adı. Kutunun dışına çıkan iki kablo <b>pinler</b>: soldaki mavi kablo giriş (<code>input</code>), sağdaki turuncu kablo çıkış (<code>output</code>). İçteki üçgen ve ucundaki küçük daire NOT kapısının standart sembolü; daire "ters çevir" demek. Alttaki satır, bu kapıyı Verilog'da kuran tek satırdır.</p>
+</div>
+
+<pre><code>`timescale 1ns/1ps
+
+module degil_kapisi (
+    input  wire a,   // giriş pini
+    output wire y    // çıkış pini
+);
+    assign y = ~a;   // y kablosu her an a'nın tersine bağlı
+endmodule</code></pre>
+
+<table class="genis">
+  <tr><th>Yazım</th><th>Ne demek?</th><th>Neden var?</th></tr>
+  <tr><td><code>`timescale 1ns/1ps</code></td><td>"Bu dosyada <code>#1</code> dediğimde 1 ns (nanosaniye, saniyenin milyarda biri) anlaşılsın; zamanı 1 ps (pikosaniye, ns'nin binde biri) hassasiyetle hesapla."</td><td>Simülatör zamanı sayı olarak tutar; sayının hangi birim olduğunu bilmesi gerekir. Her dosyanın başına yazılır, yoksa <code>iverilog</code> uyarı verir.</td></tr>
+  <tr><td><code>module degil_kapisi ( … );</code><br><code>endmodule</code></td><td>Kutunun başı ve sonu. Parantez içi pin listesi.</td><td>Python'daki <code>def</code> gibi bir tanım. Ad, dosya adıyla aynı tutulur (<code>degil_kapisi.v</code>), aranınca kolay bulunsun diye.</td></tr>
+  <tr><td><code>input</code> / <code>output</code></td><td>Pinin yönü: içeri mi giriyor, dışarı mı çıkıyor.</td><td>Gerçek bir çipte de her bacağın yönü bellidir; araç yanlış yönde sürülen pini hata olarak yakalar.</td></tr>
+  <tr><td><code>wire</code></td><td>"Bu bir <b>kablo</b>." Kablo değer saklamaz; ucuna ne bağlıysa onu taşır.</td><td>Donanımdaki en temel şey bağlantıdır. Saklayan eleman (hafıza) ayrı bir kavram; Konu 4'te gelecek.</td></tr>
+  <tr><td><code>assign y = ~a;</code></td><td><b>Sürekli atama:</b> "y kablosunu kalıcı olarak <code>~a</code>'yı üreten devreye bağla."</td><td>Bu bir kez çalışıp biten Python atamasından farklıdır. Bir lehim gibidir: <code>a</code> ne zaman değişirse <code>y</code> da o an değişir.</td></tr>
+  <tr><td><code>//</code></td><td>Yorum; araç okumaz.</td><td>Python'daki <code>#</code> gibi.</td></tr>
+</table>
+
+<p><b>Bit işlemleri (operatörler):</b> Kapılar Verilog'da birer işaretle yazılır. Her biri bitler üzerinde, bit bit çalışır:</p>
+<table>
+  <tr><th>Kapı</th><th>İşaret</th><th>Örnek</th></tr>
+  <tr><td>NOT (DEĞİL)</td><td><code>~</code></td><td><code>~a</code></td></tr>
+  <tr><td>AND (VE)</td><td><code>&amp;</code></td><td><code>a &amp; b</code></td></tr>
+  <tr><td>OR (VEYA)</td><td><code>|</code></td><td><code>a | b</code></td></tr>
+  <tr><td>XOR (ÖZEL VEYA)</td><td><code>^</code></td><td><code>a ^ b</code></td></tr>
+</table>
+
+<h3>8.2 Testbench: <code>tb_degil_kapisi</code></h3>
+
+<p><b>Ana fikir:</b> Testbench, DUT'u içine "sokete takar" gibi yerleştiren ve girişlerini <b>zamanla</b> değiştiren bir modüldür. Kendisinin pini yoktur, çünkü dışarıyla konuşmaz; en dıştaki kutudur. Tasarımdan farkı, içinde <b>zaman</b> ve <b>sıra</b> olmasıdır: "önce a=0 yap, 10 ns bekle, kontrol et, sonra a=1 yap…" Bu sıralı anlatım gerçek donanıma dönüşmez; yalnızca simülatörde çalışır.</p>
+
+<pre><code>`timescale 1ns/1ps
+
+module tb_degil_kapisi;
+    reg  a;              // testbench'in sürdüğü giriş: değeri biz atarız
+    wire y;              // DUT'un sürdüğü çıkış: biz sadece okuruz
+    integer hata = 0;    // bulunan hata sayısı
+
+    // DUT'u "sokete tak": pinleri adıyla bağla
+    degil_kapisi dut (.a(a), .y(y));
+
+    initial begin
+        $dumpfile("sim_build/dalga_degil.vcd");
+        $dumpvars(0, tb_degil_kapisi);
+
+        a = 0; #10;
+        if (y !== 1'b1) begin $display("HATA: a=0 iken y=%b", y); hata = hata + 1; end
+
+        a = 1; #10;
+        if (y !== 1'b0) begin $display("HATA: a=1 iken y=%b", y); hata = hata + 1; end
+
+        if (hata == 0) $display("TEST GECTI");
+        else           $display("TEST KALDI: %0d hata", hata);
+        $finish;
+    end
+endmodule</code></pre>
+
+<table class="genis">
+  <tr><th>Yazım</th><th>Ne demek?</th><th>Neden böyle?</th></tr>
+  <tr><td><code>module tb_degil_kapisi;</code></td><td>Pin listesi olmayan modül.</td><td>Testbench en dıştaki kutudur; bağlanacağı bir dış dünya yok.</td></tr>
+  <tr><td><code>reg a;</code></td><td><code>a</code>, <b>değer tutan</b> bir değişken. Ona <code>a = 0</code> diye değer verip bir sonraki atamaya kadar o değerde bırakabiliriz.</td><td><code>wire</code> değer tutamaz, yalnızca bir kaynağa bağlanır. Testbench girişi "elle" ayarladığı için tutan bir şey gerekir. (Adı <i>register</i>'dan gelir ama burada gerçek bir yazmaç oluşmaz; Konu 4'te bu farkı netleştireceğiz.)</td></tr>
+  <tr><td><code>wire y;</code></td><td>DUT'un çıkışına bağlı kablo.</td><td><code>y</code>'yi DUT sürer; testbench sadece okur.</td></tr>
+  <tr><td><code>integer hata = 0;</code></td><td>Sayaç değişkeni (32 bitlik tamsayı).</td><td>Sonda tek satırla "geçti / kaldı" demek için hataları sayarız.</td></tr>
+  <tr><td><code>degil_kapisi dut (.a(a), .y(y));</code></td><td><b>Örnekleme</b> (instance): <code>degil_kapisi</code> tipinden <code>dut</code> adlı bir kopya oluştur. <code>.a(a)</code> = "çipin <code>a</code> pinini benim <code>a</code> kabloma bağla."</td><td>Modül bir kalıp, örnek o kalıptan basılmış bir çip. Aynı modülden istediğin kadar örnek koyabilirsin. Pinleri adıyla bağlamak, sıraya güvenmekten daha güvenlidir.</td></tr>
+  <tr><td><code>initial begin … end</code></td><td>Simülasyon başlarken <b>bir kez</b>, yukarıdan aşağı sırayla çalışan blok.</td><td>Testbench'e sıra ve zaman burada gelir. <code>begin</code>/<code>end</code>, Python'daki girinti bloğunun karşılığıdır.</td></tr>
+  <tr><td><code>#10;</code></td><td>"10 zaman birimi (burada 10 ns) bekle."</td><td>Girişi değiştirdikten sonra beklemezsen, kontrol aynı anda yapılır ve dalga formunda her şey üst üste biner. Bekleme, her kombinasyona dalga formunda kendi aralığını verir.</td></tr>
+  <tr><td><code>$dumpfile</code>, <code>$dumpvars</code></td><td>"Dalga kaydını şu dosyaya yaz; bu modüldeki ve altındaki bütün sinyalleri kaydet." (<code>0</code> = "bütün alt seviyeler")</td><td><code>$</code> ile başlayan komutlar <b>sistem görevleri</b>dir: devre değil, simülatöre verilen emirler. GTKWave'in açacağı <code>.vcd</code> dosyası buradan çıkar.</td></tr>
+  <tr><td><code>1'b1</code></td><td>Verilog sayı yazımı: <b>1</b> bit genişliğinde, <b>b</b>inary (ikili) tabanda, değeri <b>1</b>.</td><td>Donanımda bir sayının kaç kablodan oluştuğu önemlidir; bu yazım genişliği açıkça söyler.</td></tr>
+  <tr><td><code>!==</code></td><td>"Birebir aynı değilse."</td><td>Verilog'da bir kablo 0 ve 1 dışında <b>x</b> (bilinmiyor, ör. hiç sürülmemiş) da olabilir. <code>!=</code> x ile karşılaşınca "bilmiyorum" der ve <code>if</code> hatayı kaçırır; <code>!==</code> x'i de hata sayar.</td></tr>
+  <tr><td><code>$display("… y=%b", y)</code></td><td>Terminale yazdır; <code>%b</code> yerine <code>y</code>'nin ikili değeri gelir.</td><td>Python'daki <code>print(f"y={y}")</code>.</td></tr>
+  <tr><td><code>$finish;</code></td><td>Simülasyonu bitir.</td><td>Yazmazsan simülatör "daha olacak bir şey var mı?" diye beklemeyi sürdürebilir.</td></tr>
+</table>
+
+<p>Bu testbench'in zamanda yaptığı:</p>
+<div class="kutu">
+<script type="WaveDrom">
+{ "signal": [
+  { "name": "zaman (ns)", "wave": "==", "data": ["0", "10"] },
+  { "name": "a (reg)", "wave": "01" },
+  { "name": "y (wire)", "wave": "10" },
+  { "name": "kontrol", "wave": "==", "data": ["y 1 mi?", "y 0 mı?"] }
+],
+  "config": { "hscale": 3 } }
+</script>
+</div>
+<p class="okuma"><b>Nasıl okunur:</b> Soldan sağa zaman akar; her sütun 10 ns'lik bir <code>#10</code> beklemesidir. <code>a</code> satırı testbench'in verdiği değer, <code>y</code> satırı DUT'un cevabı. En alttaki satır, o aralığın sonunda <code>if</code> ile sorulan soruyu gösterir.</p>
+
+<p><b>Ölçülerek doğrulandı:</b> Bu iki dosya <code>konular/konu-00-kurulum/ornekler/</code> altında. Simülasyon <code>TEST GECTI</code> yazdı. Kapı bilerek bozulunca (<code>assign y = a;</code>) aynı testbench <code>TEST KALDI: 2 hata</code> yazdı, yani testbench hatayı gerçekten yakalıyor. İyi bir testbench'in ölçüsü budur: <b>bozuk devrede kalmalı</b>.</p>
+
+<p class="soru"><b>Kendine sor:</b> AND kapısının iki girişi var. Testbench'inde kaç tane <code>reg</code>, kaç tane <code>#10</code> ve kaç tane <code>if</code> olmalı? Her <code>if</code>'te beklenen <code>y</code> ne olmalı?</p>
+
+<h2>9. Sıra sende: ilk simülasyonun</h2>
+
+<ol>
+  <li><code>rtl/and_kapisi.v</code> dosyasını yaz: iki giriş (<code>a</code>, <code>b</code>), bir çıkış (<code>y</code>).</li>
+  <li><code>tb/tb_and_kapisi.v</code> dosyasını yaz: dört kombinasyonu sırayla ver, her birinde <code>y</code>'yi beklenenle karşılaştır, dalgayı <code>sim_build/dalga.vcd</code> dosyasına kaydet.</li>
+  <li>Proje klasöründe şu üç komutu sırayla çalıştır (5. bölümdeki şemanın üç sarı kutusu):</li>
+</ol>
+<pre><code>iverilog -o sim_build/and.vvp rtl/and_kapisi.v tb/tb_and_kapisi.v
+vvp sim_build/and.vvp
+gtkwave sim_build/dalga.vcd</code></pre>
+<p>Takılırsan sohbette sor; önce kavramsal ipucu gelir, kod en son. Yazınca "incele" de, simülasyonu birlikte çalıştırırız.</p>
+
+<script>
+  // Etkileşimli AND kapısı
+  const durum = { a: 0, b: 0 };
+  const renk = v => v ? "#e03131" : "#868e96";
+  function ciz() {
+    const y = durum.a & durum.b;
+    for (const k of ["a", "b"]) {
+      const btn = document.getElementById("btn-" + k);
+      btn.textContent = `${k} = ${durum[k]}`;
+      btn.setAttribute("aria-pressed", durum[k] ? "true" : "false");
+      document.getElementById("tel-" + k).setAttribute("stroke", renk(durum[k]));
+      document.getElementById("deg-" + k).textContent = durum[k];
+    }
+    document.getElementById("tel-y").setAttribute("stroke", renk(y));
+    document.getElementById("deg-y").textContent = y;
+    document.getElementById("cikis").textContent = `y = ${y}`;
+    document.querySelectorAll("#dogruluk tr[data-k]").forEach(tr =>
+      tr.classList.toggle("aktif", tr.dataset.k === `${durum.a}${durum.b}`));
+  }
+  document.getElementById("btn-a").onclick = () => { durum.a ^= 1; ciz(); };
+  document.getElementById("btn-b").onclick = () => { durum.b ^= 1; ciz(); };
+  ciz();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/wavedrom@3/skins/default.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/wavedrom@3/wavedrom.min.js"></script>
+<script>window.addEventListener("load", () => WaveDrom.ProcessAll());</script>
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true, theme: "neutral" });
+</script>
+</body>
+</html>

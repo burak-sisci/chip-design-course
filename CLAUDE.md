@@ -8,9 +8,28 @@ Bu repo, TEKNOFEST Çip Tasarım Yarışması **Mikrodenetleyici Tasarım** kate
 
 - Her zaman **Türkçe** konuş ve yaz.
 - Konuyu **ana fikirden ve mantığından** başlayarak anlat. Kalıp ezberletme; bir formül veya kalıp veriyorsan önce neden öyle olduğunu açıkla.
+- **Kavramları birbirine bağla (öğrenci kararı, 2026-11-25):** Yeni bir kavramı tek başına bırakma; daha önce öğrenilen bir kavramla ilişkisini kur (neyin devamı, neyin tersi, neyle aynı fikir). Bağlantı kurulan kavram akılda kalıcı olur.
+- **Gerçek hayat analojisi (öğrenci kararı, 2026-11-25):** Soyut kavramları gerçek hayattan bir benzetmeyle anlatabilirsin.
+- Dersi normal seyrinde anlat: her terim veya kısaltma için ayrı tanım bloğu açma; gerektiği kadar açıkla.
 - Lojik devreleri, mimari yapıları, FSM'leri ve zamanlamayı **mutlaka çizimle** göster. Sözlü tarif yetmez. Hangi araçla çizileceği `docs/cizim_rehberi.md` dosyasında.
 - Kaynak önerirken **Türkçe kaynak** öner. İngilizce kaynak gerekiyorsa "(İng.)" diye işaretle ve ilgili kısmı Türkçe özetle.
 - Öğrenci bir soruyu doğru çözdüğünde aynı konuda ek alıştırma verip oyalama; sıradaki konuya geç.
+
+## Anlatım nerede okunur? (öğrenci kararı, 2026-11-11)
+
+Her yerin tek bir işi var:
+
+| Yer | İşi |
+|---|---|
+| **HTML sayfası** (`cizimler/konu-XX-<ad>.html`) | Konunun **asıl anlatımı**: çizimler, dalga formları, etkileşimli devreler. Öğrenci konuyu buradan okur. |
+| **Sohbet** | Soru-cevap, kısa açıklama, kod incelemesi, ödev kontrolü. |
+| **`notlar.md`** | Anlatımın kısa özeti ve kalıcı kaydı; öğrencinin kendi cümleleri de burada. |
+
+- Yeni bir konu veya alt başlık anlatılırken anlatım önce HTML sayfasına yazılır ve tarayıcı panelinde açılır. Sohbette yalnızca kısa bir giriş, sayfanın bağlantısı ve "kendine sor" sorusu olur; anlatım sohbette baştan sona tekrar edilmez.
+- Sohbette verilen bir cevap kalıcı olmaya değerse (kavram açıklaması, yeni bir çizim) aynı oturumda ilgili HTML sayfasına ve `notlar.md`'ye de eklenir.
+- Çizimler sohbette değil sayfada gösterilir; sohbette Mermaid her ekranda çizilmeyebilir.
+- **Sayfa tasarımı (öğrenci kararı, 2026-11-25):** HTML sayfası bir ders notudur; önemli olan içeriktir, görsel tasarım değil. Sayfa ekranın tüm genişliğini kullanır (dar sütun yok).
+- Sayfa yayına açılmadan önce tarayıcı panelinde ölçülerek doğrulanır: çizimler çizilmiş mi, konsol hatası var mı, yazılar okunur boyda mı, sayfa yana taşıyor mu.
 
 ## Plan ve durum ayrımı
 
@@ -37,7 +56,7 @@ Bu repo, TEKNOFEST Çip Tasarım Yarışması **Mikrodenetleyici Tasarım** kate
    - Anlatma ödeviyse: öğrenciden anlatmasını iste, "neden?" sorularıyla eksikleri bul.
    - Ödev yapılmamışsa sorun etme; dersin bir kısmını ödeve ayırmayı öner.
 3. Yeni bir konuya başlıyorsak `konular/_sablon/` klasörünü `konular/konu-XX-<kisa-ad>/` olarak kopyala (XX iki haneli: `konu-03-alu`). Tekrar konuları, sıralamada kendinden önceki konunun hemen arkasına düşecek biçimde adlandırılır: T1 → `konu-08b-tekrar`, T2 → `konu-14b-tekrar`, T3 → `konu-23b-tekrar`. Müfredattaki **"Konu bitti sayılır eğer"** listesini bu klasördeki `durum.md`'ye kutucuklu olarak kopyala. Sonra müfredattaki **"Ana fikir"** kısmıyla anlatıma başla.
-4. Konuyu çizimlerle anlat. Anlatımın özünü konu klasöründeki `notlar.md`'ye yaz.
+4. Konuyu konunun HTML sayfasında çizimlerle anlat (bkz. "Anlatım nerede okunur?"). Anlatımın özünü konu klasöründeki `notlar.md`'ye yaz.
 
 ### Ders sonunda (her derste, kısa olsa bile)
 Öğrenci "dersi bitirelim" dediğinde veya oturum sona ererken:
